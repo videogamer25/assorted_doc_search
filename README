@@ -1,0 +1,18 @@
+This project is a search engine for docments on a particular subject.  The back-end will be written in Java and use Apache Solr (Lucene) for the search index.  Trying to keep the scope small initially:
+
+1. There will be an admin interface for loading content into a database (probably PostgreSQL).  
+   This should be a small scope thing, so we'll have a table in the DB with valid admin email addresses.  
+   The admin login page will just have a field for an email address; once submitted an email with a one-time code will be emailed ONLY if the email is valid.
+   The one-time code will be derived from a UUID and timestamp and be good for at most 5 minutes.
+   After submitting an email, there will be a code entry field and once a valid code is entered, an admin session will be open for a little while, maybe 30 minutes.
+   This moves into the main admin interface (will probably be a fairly simple JSP page with very basic presentation).  It'll allow the user to create records via submitting a URL the content can be retrieved from or uploading a file.
+   Each record will be given a content type.  The types we intend to support initially are web page (we can extract the relevant text using the JSoup library), 
+   PDF, Word doc (Apache Tika should be able to handle those and a few other document file types if needed), and YouTube video transcript (can be copy-pasted from the UI into a text file complete with timestamps).
+   Each record will also have a generated ID, title (user entered), gathered date (in case it changes over time like a web page), URL (so users can view search results in original context), 
+   extracted text (will be kept compressed in DB to save space as it shouldn't be accessed much), comments (user entered, optional), and maybe source-specific columns like YouTube video timestamps.
+   Related to the records we'll also have a tags table to allow for some categorization and a linked records table that'll allow records to be grouped together if they all cover the same topic for example.
+
+2. There will be a public-facing search page.  Lucene/Solr can support some pretty dense queries so ideally I'd like to have an expandable interface where you can link and nest search expressions together.
+   Initially, we might just go with a simple page with a field for each of the main columns, with each followed by an operator list and field or value selector for what to search that column for.
+   After the search is submitted it'll return the results in a table.  The records don't have many columns, so the table should just contain all of them.  For the tables with related data, we'll have a
+   column in the results table for tags and linked records respectively with a hyperlink or button that when clicked will show the relevant data in a modal dialog.
